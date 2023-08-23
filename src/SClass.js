@@ -17,9 +17,7 @@ function createSClass(Fn) {
           ) {
             const desc = Object.getOwnPropertyDescriptor(obj, p);
 
-            if (Boolean(desc?.get)) {
-              return desc.get.call(target);
-            }
+            if ("get" in Object(desc)) return desc.get.call(target);
           }
 
           return target.get.call(self, target, p, receiver);
@@ -36,12 +34,11 @@ function createSClass(Fn) {
           ) {
             const desc = Object.getOwnPropertyDescriptor(obj, p);
 
-            if (Boolean(desc?.set)) {
+            if ("set" in Object(desc))
               if (desc.set.call(target, value)) {
                 result = true;
                 break;
               } else return true;
-            }
           }
 
           if (!result)
@@ -51,7 +48,7 @@ function createSClass(Fn) {
             newValue = Object.assign(Fn(), target);
 
             target.emit("onChange", newValue, oldValue);
-            target.onChange(newValue, oldValue);
+            target.onChange.call(self, newValue, oldValue);
 
             return result;
           } else return true;
@@ -64,7 +61,7 @@ function createSClass(Fn) {
             newValue = Object.assign(Fn(), target);
 
             target.emit("onChange", newValue, oldValue);
-            target.onChange(newValue, oldValue);
+            target.onChange.call(self, newValue, oldValue);
 
             return true;
           } else return true;
@@ -75,18 +72,18 @@ function createSClass(Fn) {
       return self;
     }
 
-    deleteProperty() {
-      return Reflect.deleteProperty(...arguments);
+    deleteProperty(target, p) {
+      return Reflect.deleteProperty(target, p);
     }
-    get() {
-      return Reflect.get(...arguments);
+    get(target, p, receiver) {
+      return Reflect.get(target, p, receiver);
     }
     onChange(listener) {
       if (typeof listener == "function")
         return this.addListener("onChange", listener);
     }
-    set() {
-      return Reflect.set(...arguments);
+    set(target, p, value, receiver) {
+      return Reflect.set(target, p, value, receiver);
     }
   };
 }
