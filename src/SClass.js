@@ -10,14 +10,10 @@ function createSClass(Fn) {
 
       const handler = {
         get(target, p, receiver) {
-          for (
-            var obj = target;
-            Boolean(obj);
-            obj = Object.getPrototypeOf(obj)
-          ) {
+          for (var obj = target; obj; obj = Object.getPrototypeOf(obj)) {
             const desc = Object.getOwnPropertyDescriptor(obj, p);
 
-            if ("get" in Object(desc)) return desc.get.call(target);
+            if (desc?.get) return desc.get.call(target);
           }
 
           return target.get.call(self, target, p, receiver);
@@ -27,14 +23,10 @@ function createSClass(Fn) {
 
           oldValue = newValue;
 
-          for (
-            var obj = target;
-            Boolean(obj);
-            obj = Object.getPrototypeOf(obj)
-          ) {
+          for (var obj = target; obj; obj = Object.getPrototypeOf(obj)) {
             const desc = Object.getOwnPropertyDescriptor(obj, p);
 
-            if ("set" in Object(desc))
+            if (desc?.set)
               if (desc.set.call(target, value)) {
                 result = true;
                 break;
