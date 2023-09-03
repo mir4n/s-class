@@ -5,58 +5,15 @@ function createSClass(Fn) {
     constructor() {
       super(...arguments);
 
-      var oldValue,
-        newValue = Fn();
-
       const handler = {
         get(target, p, receiver) {
-          for (var obj = target; obj; obj = Object.getPrototypeOf(obj)) {
-            const desc = Object.getOwnPropertyDescriptor(obj, p);
-
-            if (desc?.get) return desc.get.call(target);
-          }
-
           return target.get.call(self, target, p, receiver);
         },
         set(target, p, value, receiver) {
-          var result;
-
-          oldValue = newValue;
-
-          for (var obj = target; obj; obj = Object.getPrototypeOf(obj)) {
-            const desc = Object.getOwnPropertyDescriptor(obj, p);
-
-            if (desc?.set)
-              if (desc.set.call(target, value)) {
-                result = true;
-                break;
-              } else return true;
-          }
-
-          if (!result)
-            result = target.set.call(self, target, p, value, receiver);
-
-          if (result) {
-            newValue = Object.assign(Fn(), target);
-
-            target.emit("onChange", newValue, oldValue);
-            target.onChange.call(self, newValue, oldValue);
-
-            return result;
-          } else return true;
+          return target.set.call(self, target, p, value, receiver);
         },
-
         deleteProperty(target, p) {
-          oldValue = newValue;
-
-          if (target.deleteProperty.call(self, target, p)) {
-            newValue = Object.assign(Fn(), target);
-
-            target.emit("onChange", newValue, oldValue);
-            target.onChange.call(self, newValue, oldValue);
-
-            return true;
-          } else return true;
+          return target.deleteProperty.call(self, target, p);
         },
       };
 
@@ -65,17 +22,32 @@ function createSClass(Fn) {
     }
 
     deleteProperty(target, p) {
-      return Reflect.deleteProperty(target, p);
+      const oldValue = Object.assign(Fn(), target);
+
+      if (Reflect.deleteProperty(target, p)) {
+        const newValue = Object.assign(Fn(), target);
+
+        target.onChange.call(target, newValue, oldValue);
+
+        return true;
+      } else return true;
     }
     get(target, p, receiver) {
       return Reflect.get(target, p, receiver);
     }
-    onChange(listener) {
-      if (typeof listener == "function")
-        return this.addListener("onChange", listener);
+    onChange(newValue, oldValue) {
+      this.emit("onChange", newValue, oldValue);
     }
     set(target, p, value, receiver) {
-      return Reflect.set(target, p, value, receiver);
+      const oldValue = Object.assign(Fn(), target);
+
+      if (Reflect.set(target, p, value, receiver)) {
+        const newValue = Object.assign(Fn(), target);
+
+        target.onChange.call(target, newValue, oldValue);
+
+        return true;
+      } else return true;
     }
   };
 }
