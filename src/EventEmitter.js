@@ -9,7 +9,7 @@ function createEventEmitter(Fn) {
       });
     }
 
-    addListener(eventType, listener) {
+    addEventListener(eventType, listener) {
       const self = this;
 
       if (!Array.isArray(self._events[eventType])) self._events[eventType] = [];
@@ -25,10 +25,7 @@ function createEventEmitter(Fn) {
     emit(eventType, ...args) {
       (this._events[eventType] || []).forEach((listener) => listener(...args));
     }
-    removeAllListeners(eventType) {
-      return delete this._events[eventType];
-    }
-    removeListener(eventType, target) {
+    removeEventListener(eventType, target) {
       const start = (this._events[eventType] || []).indexOf(target);
       (this._events[eventType] || []).splice(start, 1);
 

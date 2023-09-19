@@ -24,13 +24,10 @@ function createSClass(Fn) {
     deleteProperty(target, p) {
       const oldValue = Object.assign(Fn(), target);
 
-      if (Reflect.deleteProperty(target, p)) {
-        const newValue = Object.assign(Fn(), target);
+      if (Reflect.deleteProperty(target, p))
+        target.onChange.call(this, target, oldValue);
 
-        target.onChange.call(target, newValue, oldValue);
-
-        return true;
-      } else return true;
+      return true;
     }
     get(target, p, receiver) {
       return Reflect.get(target, p, receiver);
@@ -41,13 +38,10 @@ function createSClass(Fn) {
     set(target, p, value, receiver) {
       const oldValue = Object.assign(Fn(), target);
 
-      if (Reflect.set(target, p, value, receiver)) {
-        const newValue = Object.assign(Fn(), target);
+      if (Reflect.set(target, p, value, receiver))
+        target.onChange.call(this, target, oldValue);
 
-        target.onChange.call(target, newValue, oldValue);
-
-        return true;
-      } else return true;
+      return true;
     }
   };
 }
