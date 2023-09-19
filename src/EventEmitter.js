@@ -15,7 +15,7 @@ function createEventEmitter(Fn) {
       if (!Array.isArray(self._events[eventType])) self._events[eventType] = [];
 
       listener.remove = function remove() {
-        self.removeListener(eventType, listener);
+        self.removeEventListener(eventType, listener);
       };
 
       self._events[eventType].push(listener);
