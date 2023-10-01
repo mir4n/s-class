@@ -1,7 +1,7 @@
 import createEventEmitter from "./EventEmitter";
 
 function createSClass(Fn) {
-  return class SClass extends createEventEmitter(Fn) {
+  return class S_Class extends createEventEmitter(Fn) {
     constructor() {
       super(...arguments);
 
@@ -24,8 +24,10 @@ function createSClass(Fn) {
     deleteProperty(target, p) {
       const oldValue = Object.assign(Fn(), target);
 
-      if (Reflect.deleteProperty(target, p))
+      if (Reflect.deleteProperty(target, p)) {
+        if (target instanceof Array) target.splice(p, 1);
         target.onChange.call(this, target, oldValue);
+      }
 
       return true;
     }
