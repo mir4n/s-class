@@ -1,5 +1,5 @@
-function createEventEmitter(Fn) {
-  return class EventEmitter extends Fn {
+function CEE(C) {
+  return class extends C {
     constructor() {
       super(...arguments);
 
@@ -29,16 +29,17 @@ function createEventEmitter(Fn) {
       const start = (this._events[eventType] || []).indexOf(target);
       (this._events[eventType] || []).splice(start, 1);
 
-      if (!Boolean(this._events[eventType].length))
+      if (!Boolean(this._events[eventType].length)) {
         delete this._events[eventType];
+      }
     }
   };
 }
 
-export default Object.assign(createEventEmitter, {
-  Array: createEventEmitter(Array),
-  Boolean: createEventEmitter(Boolean),
-  Number: createEventEmitter(Number),
-  Object: createEventEmitter(Object),
-  String: createEventEmitter(String),
+export default Object.assign(CEE, {
+  Array: CEE(Array),
+  Boolean: CEE(Boolean),
+  Number: CEE(Number),
+  Object: CEE(Object),
+  String: CEE(String),
 });

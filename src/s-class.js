@@ -1,7 +1,7 @@
-import createEventEmitter from "./EventEmitter";
+import CEE from "./event-emitter";
 
-function createSClass(Fn) {
-  return class S_Class extends createEventEmitter(Fn) {
+function CSC(C) {
+  return class extends CEE(C) {
     constructor() {
       super(...arguments);
 
@@ -25,7 +25,6 @@ function createSClass(Fn) {
       const oldValue = Object.assign(Fn(), target);
 
       if (Reflect.deleteProperty(target, p)) {
-        if (target instanceof Array) target.splice(p, 1);
         target.onChange.call(this, target, oldValue);
       }
 
@@ -40,18 +39,19 @@ function createSClass(Fn) {
     set(target, p, value, receiver) {
       const oldValue = Object.assign(Fn(), target);
 
-      if (Reflect.set(target, p, value, receiver))
+      if (Reflect.set(target, p, value, receiver)) {
         target.onChange.call(this, target, oldValue);
+      }
 
       return true;
     }
   };
 }
 
-export default Object.assign(createSClass, {
-  Array: createSClass(Array),
-  Boolean: createSClass(Boolean),
-  Number: createSClass(Number),
-  Object: createSClass(Object),
-  String: createSClass(String),
+export default Object.assign(CSC, {
+  Array: CSC(Array),
+  Boolean: CSC(Boolean),
+  Number: CSC(Number),
+  Object: CSC(Object),
+  String: CSC(String),
 });
