@@ -22,7 +22,7 @@ function CSC(C) {
     }
 
     deleteProperty(target, p) {
-      const oldValue = Object.assign(Fn(), target);
+      const oldValue = Object.assign(C(), target);
 
       if (Reflect.deleteProperty(target, p)) {
         target.onChange.call(this, target, oldValue);
@@ -37,7 +37,7 @@ function CSC(C) {
       this.emit("onChange", newValue, oldValue);
     }
     set(target, p, value, receiver) {
-      const oldValue = Object.assign(Fn(), target);
+      const oldValue = Object.assign(C(), target);
 
       if (Reflect.set(target, p, value, receiver)) {
         target.onChange.call(this, target, oldValue);
