@@ -9,25 +9,28 @@ function CEE(C) {
       });
     }
 
-    addEventListener(eventType, listener) {
+    addListener(eventType, listener) {
       const self = this;
 
-      if (!Array.isArray(self._events[eventType])) self._events[eventType] = [];
-
       listener.remove = function remove() {
-        self.removeEventListener(eventType, listener);
+        self.removeListener(eventType, listener);
       };
 
-      self._events[eventType].push(listener);
+      if (this._events[eventType] instanceof Array) {
+        self._events[eventType].push(listener);
+      } else self._events[eventType] = [listener];
 
       return listener;
     }
     emit(eventType, ...args) {
-      (this._events[eventType] || []).forEach((listener) => listener(...args));
+      for (const listener of this._events[eventType] || []) listener(...args);
     }
-    removeEventListener(eventType, target) {
+    removeAllListener(eventType) {
+      delete this._events[eventType];
+    }
+    removeListener(eventType, listener) {
       if (this._events[eventType] instanceof Array) {
-        const start = this._events[eventType].indexOf(target);
+        const start = this._events[eventType].indexOf(listener);
         this._events[eventType].splice(start, 1);
 
         if (!Boolean(this._events[eventType].length)) {
